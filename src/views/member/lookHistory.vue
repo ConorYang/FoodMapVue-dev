@@ -197,7 +197,7 @@ export default {
 }
 
 /* 右側主內容 */
-.history-content {
+/* .history-content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -205,7 +205,7 @@ export default {
   align-items: center;
   text-align: center;
   padding: 40px 20px;
-}
+} */
 
 /* 響應式：小螢幕改為上下排列 */
 @media (max-width: 992px) {
@@ -229,12 +229,12 @@ export default {
 
 .history-grid {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   gap: 2rem 1.5rem;
   width: 100%;
-  margin-bottom: 2.5rem;
+  margin-top: -400px; /* 往上移 20px，可自行調整 */
 }
+
 
 .history-card {
   width: 260px;

@@ -2,67 +2,8 @@
     <div class="container-fluid">
         <div class="d-flex flex-row flex-nowrap">
 
-            <!-- Sidebar -->
-            <nav id="sidebarMenu" class="sidebar bg-light collapse show">
-                <ul class="nav flex-column h-100">
-                    <li class="nav-item" data-aos="fade-down" data-aos-delay="0">
-                        <RouterLink to="/member/memberHome" class="nav-link">
-                            <i class="bi-house-fill me-2"></i> Overview
-                        </RouterLink>
-                    </li>
-                    <li class="nav-item" data-aos="fade-down" data-aos-delay="100">
-                        <RouterLink to="/member/profile" class="nav-link">
-                            <i class="bi-gear me-2"></i> 會員設定
-                        </RouterLink>
-                    </li>
-                    <li class="nav-item" data-aos="fade-down" data-aos-delay="200">
-                        <RouterLink to="/member/orderHistory" class="nav-link">
-                            <i class="bi-wallet me-2"></i> 訂單紀錄
-                        </RouterLink>
-                    </li>
-                    <li class="nav-item" data-aos="fade-down" data-aos-delay="300">
-                        <RouterLink to="/reservationrecords" class="nav-link">
-                            <i class="bi-fork-knife me-2"></i> 訂位紀錄
-                        </RouterLink>
-                    </li>
-                    <li class="nav-item" data-aos="fade-down" data-aos-delay="400">
-                        <RouterLink to="/cart" class="nav-link">
-                            <i class="bi-cart-plus me-2"></i> 購物車
-                        </RouterLink>
-                    </li>
-                    <li class="nav-item" data-aos="fade-down" data-aos-delay="500">
-                        <RouterLink to="/member/lookHistory" class="nav-link">
-                            <i class="bi-search me-2"></i> 瀏覽紀錄
-                        </RouterLink>
-                    </li>
-                    <li class="nav-item" data-aos="fade-down" data-aos-delay="600">
-                        <RouterLink to="/member/commentRecord" class="nav-link">
-                            <i class="bi-messenger me-2"></i> 評論紀錄
-                        </RouterLink>
-                    </li>
-                    <li class="nav-item" data-aos="fade-down" data-aos-delay="700">
-                        <RouterLink to="/member/favorite" class="nav-link">
-                            <i class="bi-search-heart me-2"></i> 我的收藏
-                        </RouterLink>
-                    </li>
-                    <li class="nav-item" data-aos="fade-down" data-aos-delay="800">
-                        <RouterLink to="/customerServiceRecord" class="nav-link">
-                            <i class="bi-question-circle me-2"></i> 客服中心
-                        </RouterLink>
-                    </li>
-                    <li class="nav-item" data-aos="fade-down" data-aos-delay="900">
-                        <RouterLink to="/" class="nav-link">
-                            <i class="bi-house me-2"></i> 回首頁
-                        </RouterLink>
-                    </li>
-                    <li class="nav-item border-top pt-2" data-aos="fade-down" data-aos-delay="1000">
-                        <a href="#" class="dropdown-item d-flex align-items-center" @click.prevent="logout">
-                            <i class="bi-box-arrow-left me-2"></i>
-                            登出
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+                <!-- 使用獨立的 Sidebar 組件 -->
+    <MemberSidebar @logout="logout" />
 
             <!-- Main content -->
             <main class="main-content flex-grow-1">
@@ -108,6 +49,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import MemberSidebar from "@/components/member/memberSidebar.vue";
 
 const memberId = ref('')
 const records = ref([])

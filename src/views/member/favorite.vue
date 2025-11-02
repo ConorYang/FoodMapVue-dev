@@ -1,5 +1,11 @@
 <template>
+
+
+      <!-- 側邊欄 -->
+      <MemberSidebar @logout="logout" />
+
   <div class="favorites-page">
+
     <div class="container py-3">
 
       <!-- 標題 -->
@@ -11,6 +17,7 @@
 
       <!-- 篩選區 -->
       <div class="favorites-filter">
+
         <!-- 店名搜尋 -->
         <input v-model="searchKeyword" type="text" placeholder="輸入店名關鍵字..." class="filter-input" />
 
@@ -70,6 +77,7 @@ import axiosapi from "@/plugins/axios";
 import Swal from "sweetalert2";
 import Paginate from "vuejs-paginate-next";
 import { useRouter } from "vue-router";
+import MemberSidebar from "@/components/member/memberSidebar.vue";
 
 const router = useRouter();
 const IMAGE_BASE_URL = "http://localhost:8082/Vendor_Pic/";
@@ -174,6 +182,9 @@ onMounted(loadFavorites);
 .container {
   max-width: 1100px;
   margin: 0 auto;
+  margin-top: -970px;
+  margin-left: 400px;
+  
 }
 
 /* --- 標題與篩選列 --- */
@@ -257,8 +268,10 @@ onMounted(loadFavorites);
   background: #fffdf9;
   border-radius: 14px;
   padding: 20px 30px;
+  width: 600px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  margin-left: 230px;
 }
 
 .favorite-item:hover {

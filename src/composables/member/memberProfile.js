@@ -74,7 +74,7 @@ export function memberProfile() {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
     return member?.avatarURL
       ? `${baseUrl}/uploads/avatars/${member.avatarURL}`
-      : '/images/default-avatar.png';
+      : '/images/gururu_food.png';
   });
 
   const onAvatarChange = (e) => {

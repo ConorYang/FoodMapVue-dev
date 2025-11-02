@@ -20,7 +20,7 @@
               <i class="bi bi-person-fill-slash me-2"></i>黑名單管理
             </RouterLink>
           </li>
-              <li class="nav-item mb-2">
+          <li class="nav-item mb-2">
             <RouterLink class="nav-link" to="/admin/adminProductReview">
               <i class="bi-card-checklist me-2"></i> 商品審核
             </RouterLink>
@@ -41,35 +41,144 @@
 
     <!-- 主要內容區 -->
     <div class="flex-grow-1 p-3">
-      <!-- 帳號統計圖表區 -->
-      <div class="row g-3 mb-3 align-items-start">
-        <!-- 左邊：長條圖（置中） -->
-        <div class="col-lg-5 col-md-12 d-flex justify-content-center">
-          <div class="card shadow-sm w-100" style="max-width: 550px">
-            <div class="card-body">
-              <h5 class="card-title text-center mb-3">帳號總覽</h5>
-              <account-stats-chart :users="users" />
-            </div>
+      <!-- 統計卡片區 -->
+      <div class="row g-3 mb-3">
+        <!-- 統計切換選項卡 -->
+        <div class="col-12">
+          <div class="stats-tabs-container">
+            <button 
+              class="stats-tab-btn" 
+              :class="{ active: activeTab === 'accounts' }"
+              @click="activeTab = 'accounts'"
+            >
+              <i class="bi bi-people-fill me-2"></i>
+              帳號統計
+            </button>
+            <button 
+              class="stats-tab-btn" 
+              :class="{ active: activeTab === 'customer-service' }"
+              @click="activeTab = 'customer-service'"
+            >
+              <i class="bi bi-headset me-2"></i>
+              客服案件
+            </button>
+            <button 
+              class="stats-tab-btn" 
+              :class="{ active: activeTab === 'product-review' }"
+              @click="activeTab = 'product-review'"
+            >
+              <i class="bi bi-card-checklist me-2"></i>
+              商品審核
+            </button>
           </div>
         </div>
 
-        <!-- 右邊：三個資訊框 -->
-        <div class="col-lg-6 col-md-12">
-          <div class="row g-3">
-            <div class="col-12" v-for="(card, index) in infoCards" :key="index">
-              <div
-                class="card border-start border-4 shadow-sm"
-                :class="card.border"
-              >
-                <div class="card-body text-center">
-                  <h6 class="fw-semibold mb-1" :class="card.textClass">
-                    {{ card.title }}
-                  </h6>
-                  <p class="fs-6 text-muted mb-0">{{ card.desc }}</p>
+        <!-- 統計內容區 -->
+        <div class="col-12">
+          <transition name="fade" mode="out-in">
+            <!-- 帳號統計 -->
+            <div v-if="activeTab === 'accounts'" key="accounts" class="stats-content">
+              <div class="row g-3">
+                <!-- 帳號統計圖表 -->
+                <div class="col-lg-6 col-md-12">
+                  <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                      <h5 class="card-title mb-4">
+                        <i class="bi bi-bar-chart-fill me-2"></i>帳號總覽
+                      </h5>
+                      <account-stats-chart :users="users" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 帳號統計資訊卡片 -->
+                <div class="col-lg-6 col-md-12">
+                  <div class="row g-3">
+                    <!-- 總帳號數 -->
+                    <div class="col-12">
+                      <div class="info-card total">
+                        <div class="info-icon">
+                          <i class="bi bi-people-fill"></i>
+                        </div>
+                        <div class="info-content">
+                          <h3>{{ accountStats.total }}</h3>
+                          <p>總帳號數</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 會員數 -->
+                    <div class="col-12">
+                      <div class="info-card members">
+                        <div class="info-icon">
+                          <i class="bi bi-person-badge-fill"></i>
+                        </div>
+                        <div class="info-content">
+                          <h3>{{ accountStats.members }}</h3>
+                          <p>會員帳號</p>
+                          <small>{{ accountStats.memberPercentage }}%</small>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 廠商數 -->
+                    <div class="col-12">
+                      <div class="info-card vendors">
+                        <div class="info-icon">
+                          <i class="bi bi-shop"></i>
+                        </div>
+                        <div class="info-content">
+                          <h3>{{ accountStats.vendors }}</h3>
+                          <p>廠商帳號</p>
+                          <small>{{ accountStats.vendorPercentage }}%</small>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 管理員數 -->
+                    <div class="col-12">
+                      <div class="info-card admins">
+                        <div class="info-icon">
+                          <i class="bi bi-shield-fill-check"></i>
+                        </div>
+                        <div class="info-content">
+                          <h3>{{ accountStats.admins }}</h3>
+                          <p>管理員</p>
+                          <small>{{ accountStats.adminPercentage }}%</small>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 快速操作 -->
+                    <div class="col-12">
+                      <RouterLink to="/admin/adminAccounts" class="action-link-card">
+                        <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                        前往帳號管理
+                      </RouterLink>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+
+            <!-- 客服案件統計 -->
+            <div v-else-if="activeTab === 'customer-service'" key="customer-service" class="stats-content">
+              <div class="card shadow-sm">
+                <div class="card-body">
+                  <CustomerServiceStats />
+                </div>
+              </div>
+            </div>
+
+            <!-- 商品審核統計 -->
+            <div v-else key="product-review" class="stats-content">
+              <div class="card shadow-sm">
+                <div class="card-body">
+                  <ProductReviewStats />
+                </div>
+              </div>
+            </div>
+          </transition>
         </div>
       </div>
 
@@ -80,31 +189,31 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import AccountStatsChart from "@/views/admin/accountStatsChart.vue";
+import CustomerServiceStats from "@/views/customerservice/CustomerServiceStats.vue";
+import ProductReviewStats from "@/views/admin/ProductReviewStats.vue";
 
 const users = ref([]);
+const activeTab = ref('accounts');
 
-const infoCards = [
-  {
-    title: "今日登入",
-    desc: "功能待加入",
-    border: "border-info",
-    textClass: "text-info",
-  },
-  {
-    title: "本週新增",
-    desc: "功能待加入",
-    border: "border-success",
-    textClass: "text-success",
-  },
-  {
-    title: "系統通知",
-    desc: "功能待加入",
-    border: "border-secondary",
-    textClass: "text-secondary",
-  },
-];
+// 帳號統計
+const accountStats = computed(() => {
+  const total = users.value.length;
+  const members = users.value.filter(u => u.role === 'member').length;
+  const vendors = users.value.filter(u => u.role === 'vendor').length;
+  const admins = users.value.filter(u => u.role === 'admin').length;
+
+  return {
+    total,
+    members,
+    vendors,
+    admins,
+    memberPercentage: total > 0 ? Math.round((members / total) * 100) : 0,
+    vendorPercentage: total > 0 ? Math.round((vendors / total) * 100) : 0,
+    adminPercentage: total > 0 ? Math.round((admins / total) * 100) : 0
+  };
+});
 
 // 取得帳號列表 API
 const fetchUsers = async () => {
@@ -126,14 +235,272 @@ onMounted(() => {
 .card {
   margin: 0;
   padding: 0;
-  margin-top: 20px;
   width: 100%;
   border-radius: 0.8rem;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid #e8e8e8;
 }
 
 .card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* 統計切換選項卡 */
+.stats-tabs-container {
+  display: flex;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 0.75rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stats-tab-btn {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.6);
+  color: #333;
+  transform: translateY(-2px);
+}
+
+.stats-tab-btn.active {
+  background: white;
+  color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+.stats-tab-btn i {
+  font-size: 1.2rem;
+}
+
+/* 統計內容區 */
+.stats-content {
+  animation: fadeIn 0.4s ease;
+}
+
+/* 資訊卡片 */
+.info-card {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.info-card.total {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.info-card.members {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+}
+
+.info-card.vendors {
+  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+  color: white;
+}
+
+.info-card.admins {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: white;
+}
+
+.info-icon {
+  font-size: 3rem;
+  margin-right: 1.25rem;
+  opacity: 0.9;
+}
+
+.info-content h3 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.info-content p {
+  margin: 0.25rem 0 0 0;
+  font-size: 1rem;
+  opacity: 0.95;
+}
+
+.info-content small {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+/* 操作連結卡片 */
+.action-link-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #667eea;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 2px solid #e0e0e0;
+}
+
+.action-link-card:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  border-color: #667eea;
+}
+
+/* 快速操作 */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.quick-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  color: white;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.quick-action-btn.accounts {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.quick-action-btn.products {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.quick-action-btn.service {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.quick-action-btn.blacklist {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.quick-action-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  color: white;
+}
+
+.quick-action-btn i {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.quick-action-btn span {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* 淡入淡出動畫 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 響應式 */
+@media (max-width: 992px) {
+  .stats-tabs-container {
+    flex-direction: column;
+  }
+
+  .stats-tab-btn {
+    justify-content: flex-start;
+  }
+
+  .info-card {
+    padding: 1rem;
+  }
+
+  .info-icon {
+    font-size: 2.5rem;
+    margin-right: 1rem;
+  }
+
+  .info-content h3 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .quick-action-btn {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .quick-action-btn i {
+    font-size: 1.5rem;
+  }
+
+  .stats-tabs-container {
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .stats-tab-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
 }
 </style>
