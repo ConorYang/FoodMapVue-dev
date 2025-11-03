@@ -64,63 +64,78 @@
 
             <!-- 評論卡片 -->
             <div v-else class="comments-list">
-              <div v-for="comment in comments" :key="comment.commentId" class="comment-card">
+              <div
+                v-for="comment in comments"
+                :key="comment.commentId"
+                class="comment-card"
+              >
                 <!-- 評論標題列 -->
                 <div class="comment-header">
                   <div class="comment-info">
                     <i class="bi bi-person-circle user-icon"></i>
                     <span class="order-label">訂單 #{{ comment.orderId }}</span>
                   </div>
-                  <span class="comment-date">{{ formatDate(comment.createAt) }}</span>
+                  <span class="comment-date">{{
+                    formatDate(comment.createAt)
+                  }}</span>
                 </div>
 
                 <!-- 評論內容 -->
                 <div class="comment-body">
-                  <p class="comment-text">{{ comment.commentContext }}</p>
+                  <!-- 左邊：文字和標籤 -->
+                  <div class="comment-content">
+                    <p class="comment-text">{{ comment.commentContext }}</p>
 
-                  <!-- 評論標籤 -->
-                  <div v-if="hasAnyTag(comment)" class="comment-tags">
-                    <span v-if="comment.delicious" class="tag-badge delicious">
-                      <i class="bi bi-heart-fill me-1"></i>超美味
-                    </span>
-                    <span v-if="comment.quick" class="tag-badge quick">
-                      <i class="bi bi-lightning-fill me-1"></i>超快速
-                    </span>
-                    <span v-if="comment.friendly" class="tag-badge friendly">
-                      <i class="bi bi-emoji-smile-fill me-1"></i>超友善
-                    </span>
-                    <span v-if="comment.photogenic" class="tag-badge photogenic">
-                      <i class="bi bi-camera-fill me-1"></i>超上相
-                    </span>
-                    <span v-if="comment.topCP" class="tag-badge topcp">
-                      <i class="bi bi-currency-dollar me-1"></i>高CP值
-                    </span>
+                    <!-- 評論標籤 -->
+                    <div v-if="hasAnyTag(comment)" class="comment-tags">
+                      <span
+                        v-if="comment.delicious"
+                        class="tag-badge delicious"
+                      >
+                      超美味 !
+                      </span>
+                      <span v-if="comment.quick" class="tag-badge quick">
+                      超快速 !
+                      </span>
+                      <span v-if="comment.friendly" class="tag-badge friendly">
+                      超友善 !
+                      </span>
+                      <span
+                        v-if="comment.photogenic"
+                        class="tag-badge photogenic"
+                      >
+                      超上相 !
+                      </span>
+                      <span v-if="comment.topCP" class="tag-badge topcp">
+                      高CP值 !
+                      </span>
+                    </div>
                   </div>
+                    <!-- 評論圖片 -->
+                    <div v-if="hasPhotos(comment)" class="comment-photos">
+                      <img
+                        v-if="comment.photo1"
+                        :src="getPhotoPath(comment.photo1)"
+                        alt="評論圖片1"
+                        class="photo-thumbnail"
+                        @click="openPhotoModal(getPhotoPath(comment.photo1))"
+                      />
+                      <img
+                        v-if="comment.photo2"
+                        :src="getPhotoPath(comment.photo2)"
+                        alt="評論圖片2"
+                        class="photo-thumbnail"
+                        @click="openPhotoModal(getPhotoPath(comment.photo2))"
+                      />
+                      <img
+                        v-if="comment.photo3"
+                        :src="getPhotoPath(comment.photo3)"
+                        alt="評論圖片3"
+                        class="photo-thumbnail"
+                        @click="openPhotoModal(getPhotoPath(comment.photo3))"
+                      />
+                    </div>
 
-                  <!-- 評論圖片 -->
-                  <div v-if="hasPhotos(comment)" class="comment-photos">
-                    <img
-                      v-if="comment.photo1"
-                      :src="comment.photo1"
-                      alt="評論圖片1"
-                      class="photo-thumbnail"
-                      @click="openPhotoModal(comment.photo1)"
-                    />
-                    <img
-                      v-if="comment.photo2"
-                      :src="comment.photo2"
-                      alt="評論圖片2"
-                      class="photo-thumbnail"
-                      @click="openPhotoModal(comment.photo2)"
-                    />
-                    <img
-                      v-if="comment.photo3"
-                      :src="comment.photo3"
-                      alt="評論圖片3"
-                      class="photo-thumbnail"
-                      @click="openPhotoModal(comment.photo3)"
-                    />
-                  </div>
                 </div>
               </div>
             </div>
@@ -131,14 +146,16 @@
 
     <!-- 載入狀態 -->
     <div v-else class="loading-container">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">載入中...</span>
-      </div>
+      <div class="spinner"></div>
       <p class="loading-text">載入評論中...</p>
     </div>
 
     <!-- 圖片預覽 Modal -->
-    <div v-if="showPhotoModal" class="modal-overlay" @click.self="showPhotoModal = false">
+    <div
+      v-if="showPhotoModal"
+      class="modal-overlay"
+      @click.self="showPhotoModal = false"
+    >
       <div class="photo-modal-content">
         <button @click="showPhotoModal = false" class="close-button">
           <i class="bi bi-x-lg"></i>
@@ -197,6 +214,14 @@ const hasPhotos = (comment) => {
   return comment.photo1 || comment.photo2 || comment.photo3;
 };
 
+// 取得圖片路徑
+const getPhotoPath = (filename) => {
+  if (!filename) return "";
+  // 如果已經是完整路徑就直接返回
+  if (filename.startsWith("http")) return filename;
+  // 否則加上後端路徑
+  return `http://localhost:8082${filename}`;
+};
 // 開啟圖片預覽
 const openPhotoModal = (photoUrl) => {
   selectedPhoto.value = photoUrl;
@@ -210,20 +235,33 @@ onMounted(async () => {
     const res = await api.get("/vendor/self");
     vendor.value = res.data;
     console.log("取得的店家資料：", vendor.value);
-    
+
     // 使用店家後台專用的 API（有 session 驗證）
-    const response = await api.get(`/comment/commentVendor/${vendor.value.vendorId}`);
+    const response = await api.get(
+      `/comment/commentVendor/${vendor.value.vendorId}`
+    );
     comments.value = response.data;
-    
-    // 按時間排序（最新的在前）
+
+    // 排序：有評論內容的在前，再按時間排序
     if (comments.value && comments.value.length > 0) {
-      comments.value.sort((a, b) => new Date(b.createAt) - new Date(a.createAt));
+      comments.value.sort((a, b) => {
+        // 先判斷是否有評論內容
+        const aHasComment = a.commentContext && a.commentContext.trim() !== "";
+        const bHasComment = b.commentContext && b.commentContext.trim() !== "";
+
+        // 有評論的排在前面
+        if (aHasComment && !bHasComment) return -1;
+        if (!aHasComment && bHasComment) return 1;
+
+        // 都有或都沒有的話，按時間排序（最新的在前）
+        return new Date(b.createAt) - new Date(a.createAt);
+      });
     }
-    
+
     console.log("取得評論成功，共", comments.value.length, "則");
   } catch (error) {
     console.error("取得資料失敗：", error);
-    
+
     if (error.response?.status === 401) {
       alert("請先登入");
     } else if (error.response?.status === 403) {
@@ -254,7 +292,8 @@ onMounted(async () => {
 .info-section-card {
   background: #faf8f3;
   border-radius: 16px;
-  box-shadow: 0 4px 6px rgba(139, 117, 95, 0.08), 0 2px 4px rgba(139, 117, 95, 0.05);
+  box-shadow: 0 4px 6px rgba(139, 117, 95, 0.08),
+    0 2px 4px rgba(139, 117, 95, 0.05);
   overflow: hidden;
   border: 1px solid #e8dcc8;
 }
@@ -354,25 +393,24 @@ onMounted(async () => {
 }
 
 .tag-icon.delicious {
-  color: #e57373;  /* 改成你要的顏色 */
+  color: #e57373;
 }
 
 .tag-icon.quick {
-  color: #ffb74d;  /* 改成你要的顏色 */
+  color: #64b5f6;
 }
 
 .tag-icon.friendly {
-  color: #81c784;  /* 改成你要的顏色 */
+  color: #81c784;
 }
 
 .tag-icon.photogenic {
-  color: #64b5f6;  /* 改成你要的顏色 */
+  color: #ba68c8;
 }
 
 .tag-icon.topcp {
-  color: #ba68c8;  /* 改成你要的顏色 */
+  color: #ffb74d;
 }
-
 .tag-label {
   font-size: 0.875rem;
   color: #5a4a3a;
@@ -443,10 +481,26 @@ onMounted(async () => {
 
 .comment-body {
   display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: flex-start;
+}
+/* 文字區塊 */
+.comment-content {
+  flex: 1;
+  display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
+/* 圖片區塊 */
+.comment-photos {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column; /* 圖片垂直排列 */
+  gap: 0.5rem;
+  margin-top: 0; /* 移除原本的 margin-top */
+}
 .comment-text {
   font-size: 1rem;
   color: #5a4a3a;
@@ -472,31 +526,26 @@ onMounted(async () => {
 }
 
 .tag-badge.delicious {
-  background: linear-gradient(135deg, #e57373 0%, #ef5350 100%);  /* 改這裡 */
+  background: linear-gradient(135deg, #e57373 0%, #ef5350 100%);
 }
 
 .tag-badge.quick {
-  background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%);  /* 改這裡 */
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
 }
 
 .tag-badge.friendly {
-  background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);  /* 改這裡 */
+  background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
 }
 
 .tag-badge.photogenic {
-  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);  /* 改這裡 */
+  background: linear-gradient(135deg, #ba68c8 0%, #ab47bc 100%);
 }
 
 .tag-badge.topcp {
-  background: linear-gradient(135deg, #ba68c8 0%, #ab47bc 100%);  /* 改這裡 */
+  background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%);
 }
 
 /* ==================== 評論圖片 ==================== */
-.comment-photos {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
 
 .photo-thumbnail {
   width: 120px;
@@ -559,11 +608,19 @@ onMounted(async () => {
   margin: 0;
 }
 
-.spinner-border {
+.spinner {
   width: 3rem;
   height: 3rem;
-  border-width: 0.3rem;
-  color: #c9a882 !important;
+  border: 0.3rem solid #f5f1ea;
+  border-top-color: #c9a882;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==================== 圖片預覽 Modal ==================== */
@@ -662,6 +719,7 @@ onMounted(async () => {
   }
 
   .comment-photos {
+    flex-direction: row; /* 小螢幕時圖片水平排列 */
     flex-wrap: wrap;
   }
 
@@ -678,6 +736,7 @@ onMounted(async () => {
 
   .comment-photos {
     gap: 0.5rem;
+    flex-direction: row; /* 加這行 */
   }
 
   .photo-thumbnail {

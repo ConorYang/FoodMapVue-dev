@@ -87,42 +87,66 @@
             </h3>
             <div class="checkbox-grid">
               <label class="checkbox-label">
-                <input type="checkbox" v-model="details.airConditioner" class="checkbox-input" />
+                <input
+                  type="checkbox"
+                  v-model="details.airConditioner"
+                  class="checkbox-input"
+                />
                 <span class="checkbox-text">
                   <i class="bi bi-snow2 me-2"></i>冷氣空調
                 </span>
               </label>
 
               <label class="checkbox-label">
-                <input type="checkbox" v-model="details.park" class="checkbox-input" />
+                <input
+                  type="checkbox"
+                  v-model="details.park"
+                  class="checkbox-input"
+                />
                 <span class="checkbox-text">
                   <i class="bi bi-car-front me-2"></i>停車位
                 </span>
               </label>
 
               <label class="checkbox-label">
-                <input type="checkbox" v-model="details.babyFriendly" class="checkbox-input" />
+                <input
+                  type="checkbox"
+                  v-model="details.babyFriendly"
+                  class="checkbox-input"
+                />
                 <span class="checkbox-text">
                   <i class="bi bi-emoji-smile me-2"></i>嬰幼兒座位
                 </span>
               </label>
 
               <label class="checkbox-label">
-                <input type="checkbox" v-model="details.petFriendly" class="checkbox-input" />
+                <input
+                  type="checkbox"
+                  v-model="details.petFriendly"
+                  class="checkbox-input"
+                />
                 <span class="checkbox-text">
                   <i class="bi bi-heart me-2"></i>寵物友善
                 </span>
               </label>
 
               <label class="checkbox-label">
-                <input type="checkbox" v-model="details.veganFriendly" class="checkbox-input" />
+                <input
+                  type="checkbox"
+                  v-model="details.veganFriendly"
+                  class="checkbox-input"
+                />
                 <span class="checkbox-text">
                   <i class="bi bi-flower1 me-2"></i>素食友善
                 </span>
               </label>
 
               <label class="checkbox-label">
-                <input type="checkbox" v-model="details.halalFriendly" class="checkbox-input" />
+                <input
+                  type="checkbox"
+                  v-model="details.halalFriendly"
+                  class="checkbox-input"
+                />
                 <span class="checkbox-text">
                   <i class="bi bi-moon-stars me-2"></i>清真認證
                 </span>
@@ -149,7 +173,11 @@
     </div>
 
     <!-- 營業時間 Modal -->
-    <div v-if="showHoursModal" class="modal-overlay" @click.self="showHoursModal = false">
+    <div
+      v-if="showHoursModal"
+      class="modal-overlay"
+      @click.self="showHoursModal = false"
+    >
       <div class="modal-content">
         <div class="modal-header">
           <div class="header-content">
@@ -163,16 +191,24 @@
 
         <div class="modal-body">
           <div class="hours-grid">
-            <div v-for="time in fullWeek" :key="time.dayOfWeek" class="hour-item">
+            <div
+              v-for="time in fullWeek"
+              :key="time.dayOfWeek"
+              class="hour-item"
+            >
               <div class="day-header">
                 <span class="day-label">{{ getDayName(time.dayOfWeek) }}</span>
                 <label class="closed-toggle">
-                  <input type="checkbox" v-model="time.isClosed" class="checkbox-input" />
+                  <input
+                    type="checkbox"
+                    v-model="time.isClosed"
+                    class="checkbox-input"
+                  />
                   <span class="closed-text">公休</span>
                 </label>
               </div>
 
-              <div class="time-inputs" :class="{ 'disabled': time.isClosed }">
+              <div class="time-inputs" :class="{ disabled: time.isClosed }">
                 <div class="time-input-wrapper">
                   <i class="bi bi-clock me-2 time-icon"></i>
                   <input
@@ -215,6 +251,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import api from "@/api/axiosInstance";
+import Swal from "sweetalert2";
 
 const details = ref(null);
 const fullWeek = ref([]);
@@ -225,7 +262,7 @@ const showHoursModal = ref(false);
 
 // 星期對應
 const getDayName = (day) => {
-  const days = ['一', '二', '三', '四', '五', '六', '日'];
+  const days = ["一", "二", "三", "四", "五", "六", "日"];
   return days[day - 1];
 };
 
@@ -307,7 +344,12 @@ onMounted(async () => {
 // 儲存營業時間（從 modal）
 const saveHours = () => {
   showHoursModal.value = false;
-  alert("營業時間已暫存，請點擊「儲存修改」完成更新");
+  Swal.fire({
+    icon: "info",
+    title: "營業時間已暫存",
+    text: "請點擊「儲存修改」完成更新",
+    confirmButtonColer: "#d4b896",
+  });
 };
 
 // PUT 更新資料
@@ -315,19 +357,30 @@ const updateAll = async () => {
   // 送出前四捨五入
   details.value.priceMin = Math.round(details.value.priceMin);
   details.value.priceMax = Math.round(details.value.priceMax);
-  
+
   // 重新驗證
   validatePriceMin();
   validatePriceMax();
   validateSeatsNumber();
-  
-  // 若有錯誤就阻止送出
+
+  // 第一個錯誤提示
   if (seatError.value) {
-    alert("請先修正座位數錯誤，再儲存!");
+    Swal.fire({
+      icon: "error",
+      title: "資料錯誤",
+      text: "請先修正座位數錯誤，再儲存!",
+      confirmButtonColor: "#d4b896",
+    });
     return;
   }
+  // 第二個錯誤提示
   if (priceMinError.value || priceMaxError.value) {
-    alert("請先修正高低價錯誤，再儲存!");
+    Swal.fire({
+      icon: "error",
+      title: "資料錯誤",
+      text: "請先修正高低價錯誤，再儲存!",
+      confirmButtonColor: "#d4b896",
+    });
     return;
   }
 
@@ -345,10 +398,21 @@ const updateAll = async () => {
 
     await api.put("/vendor/openingHours/self", payload);
 
-    alert("修改成功！");
+    // 成功提示
+    Swal.fire({
+      icon: "success",
+      title: "修改成功！",
+      showConfirmButton: false,
+      timer: 1500,
+    });
   } catch (error) {
-    console.error("修改失敗：", error);
-    alert("修改失敗！");
+    // 失敗提示 (在 catch 區塊內)
+    Swal.fire({
+      icon: "error",
+      title: "修改失敗",
+      text: "請稍後再試",
+      confirmButtonColor: "#d4b896",
+    });
   }
 };
 </script>
@@ -371,7 +435,8 @@ const updateAll = async () => {
 .hours-section-card {
   background: #faf8f3;
   border-radius: 16px;
-  box-shadow: 0 4px 6px rgba(139, 117, 95, 0.08), 0 2px 4px rgba(139, 117, 95, 0.05);
+  box-shadow: 0 4px 6px rgba(139, 117, 95, 0.08),
+    0 2px 4px rgba(139, 117, 95, 0.05);
   overflow: hidden;
   border: 1px solid #e8dcc8;
 }

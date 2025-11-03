@@ -232,7 +232,7 @@ export default {
   justify-content: center;
   gap: 2rem 1.5rem;
   width: 100%;
-  margin-top: -400px; /* 往上移 20px，可自行調整 */
+  margin-top: -350px; /* 往上移 20px，可自行調整 */
 }
 
 

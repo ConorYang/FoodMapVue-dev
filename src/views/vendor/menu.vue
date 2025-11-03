@@ -45,7 +45,7 @@
           </span>
           <span class="status-count rejected">
             <i class="bi bi-x-circle me-1"></i>
-            已拒絕 {{ statusCount.審核不通過 }}
+            未通過 {{ statusCount.審核不通過 }}
           </span>
         </div>
       </div>
@@ -556,16 +556,27 @@ const statusCount = computed(() => {
 
 // 載入商品列表
 onMounted(async () => {
-    notificationStore.connectVendorWebSocket();
+  notificationStore.connectVendorWebSocket();
+  
+  // ✅ 初次載入
+  await loadProducts();
+  
+  // ✅ 每隔 5 秒自動刷新一次
+  setInterval(loadProducts, 5000);
+});
+
+// ✅ 將載入邏輯抽成獨立函式
+const loadProducts = async () => {
   try {
     const res = await api.get("/vProduct/self", { withCredentials: true });
     menu.value = res.data;
     console.log("我的商品資料：", menu.value);
   } catch (error) {
     console.error("取得商品資料失敗：", error);
-    Swal.fire("錯誤", "無法取得商品資料", "error");
+    // ✅ 自動刷新時不顯示錯誤提示，避免干擾使用者
+    // Swal.fire("錯誤", "無法取得商品資料", "error");
   }
-});
+};
 
 // 開啟編輯 Modal
 const openEditModal = (item) => {
@@ -767,14 +778,23 @@ const submitProduct = async () => {
     if (newProduct.value.picUrl)
       formData.append("picFile", newProduct.value.picUrl);
 
-    const res = await api.post("/vProduct/create", formData, {
+    await api.post("/vProduct/create", formData, {
       headers: { "Content-Type": "multipart/form-data" },
       withCredentials: true,
     });
 
     Swal.fire("成功", "商品已提交審核！", "success");
-    menu.value.push(res.data);
+    // ✅ 關閉表單
     showForm.value = false;
+    
+    // ✅ 加入延遲，等待後端完成圖片處理
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // ✅ 重新載入列表
+    const res = await api.get("/vProduct/self", { withCredentials: true });
+    menu.value = res.data;
+    
+    // 重置表單
     newProduct.value = {
       productName: "",
       unitPrice: null,
@@ -788,6 +808,21 @@ const submitProduct = async () => {
     Swal.fire("錯誤", "提交失敗，請檢查輸入或登入狀態！", "error");
   }
 };
+//     menu.value.push(res.data);
+//     showForm.value = false;
+//     newProduct.value = {
+//       productName: "",
+//       unitPrice: null,
+//       specialPrice: null,
+//       endDate: "",
+//       stock: null,
+//       picUrl: null,
+//     };
+//   } catch (error) {
+//     console.error("提交商品失敗：", error);
+//     Swal.fire("錯誤", "提交失敗，請檢查輸入或登入狀態！", "error");
+//   }
+// };
 
 // 取消按鈕
 const cancelForm = () => {

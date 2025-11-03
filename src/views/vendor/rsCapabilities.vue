@@ -1325,16 +1325,15 @@ onMounted(async () => {
 
 /* 表格內的特殊欄位 */
 .date-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
   white-space: nowrap;
-  color: var(--milktea-text) !important;
+  color: var(--text-primary);
 }
 
 .date-cell i {
-  color: var(--milktea-primary) !important;
+  color: var(--cream-gold);
   font-size: 1rem;
+  margin-right: 0.5rem;
+  vertical-align: middle;
 }
 
 .period-cell {
